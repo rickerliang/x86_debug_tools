@@ -1,0 +1,120 @@
+!address xxxx
+获取地址属性，例如栈，堆，代码
+
+dds xxxx xxxx
+输出地址范围及内容
+
+k 1000
+输出0x1000层调用栈
+
+k=xxxx
+从xxxx地址开始显示调用栈
+
+bp
+下普通断点，pdb要加载好
+bp @!"ExecutableName!std::pair<unsigned int,std::basic_string<unsigned short,std::char_traits<unsigned short>,std::allocator<unsigned short> > >::operator="
+
+bu 符号
+下延时断点，因为exe加载的时候，dll还没有加载，所以要延时
+
+ba
+访问断点
+
+lm
+显示模块
+lm v m 模式串
+
+lmi
+显示模块详细信息
+包括pdb匹配GUID
+
+.reload /f
+强制重新加载符号
+.reload /unl 模块
+加载已卸载的模块
+.reload /i
+加载符号，不做匹配性检查
+
+!chksym
+检查符号
+
+!teb
+!peb
+
+!gflag
+设置、查看当前gflag
+
+切换地址模式
+https://msdn.microsoft.com/en-us/library/aa384163(VS.85).aspx
+建议用 !wow64exts.sw
+.effmach
+一般是x86 amd64，用.切回默认
+
+u addr range
+显示指定addr起始，range内的汇编
+
+.fnent
+获取指定地址的function table entry，包含函数的unwind info，对x64 manual stack walking有帮助的信息
+
+k = <rsp> <rip> <frame_count>
+x64下manual stack walking
+x64下，rsp在函数执行完prologue之后就不会变化(调用约定)；
+所以
+0.如果函数内执行了call指令，call指令返回地址压栈后，rsp就会减8；
+1.也就是说，在stack reconstruction时，识别到返回地址所在的栈地址，再加8，就是当前函数执行完prologue的rsp；
+2.由于x64非叶子函数有function table entry，记录unwind info，即prologue操作，所以根据unwind info，可以还原进入当前函数时rsp的值，这个值就是指向本函数执行完时的返回地址；
+3.这时在回到步骤1，就是manual stack walking了
+
+ln addr
+显示距离最近addr的符号
+
+dt sym addr
+把addr解析为sym类型
+
+.dumpdebug
+显示dump类型信息
+
+!heap -s
+显示堆信息
+
+|
+显示进程基本信息
+
+!dh module
+显示module的header信息
+
+!chksym module pdbpath
+!itoldyouso module pdbpath
+检查module和指定的pdb有什么不对
+
+.symopt-
+.symopt+
+增删符号加载选项，+0x40可忽略不匹配符号，强制加载
+
+------------------------------------------
+内核调试(kernel debugging kd)
+C:\>windbg -k com:port=COM2,baud=57600
+C:\>windbg -k com:pipe,port=\\.\pipe\pipe2
+
+用户模式异常断入内核调试器
+1.用gflag设置 system registry "Stop on exception" flag，重启，入调试模式
+2.连接内核调试器，触发异常
+
+!process 0 flag imagename
+显示指定进程信息
+!process 0 0
+所有进程
+!process
+显示当前进程
+
+.process /p address
+切换调试进程，/p 加载进程到物理内存
+
+!thread
+显示当前线程
+
+.thread address
+切换当前调试进程的线程
+
+.trap address
+显示异常(trap)信息

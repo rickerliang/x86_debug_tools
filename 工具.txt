@@ -1,0 +1,34 @@
+﻿vs -- 简单，功能一般，dump格式支持有限(例如不支持windbg .dump /f 抓出来的full dump)，无法分析内核dump
+
+windbg -- 复杂，功能强大，举例子
+
+Debug Diagnostic Tool v2.0 -- 辅助full dump分析，得到分析报告
+
+gflag 功能超级强大的辅助工具
+https://msdn.microsoft.com/en-us/library/windows/hardware/ff549590(v=vs.85).aspx
+
+辅助检测内存越界，堆破坏
+gflags /i ImageFileName +hpa /unaligned
+推荐 gflags /p /enable test.exe /full /unaligned
+
+检查堆泄漏
+https://msdn.microsoft.com/en-us/library/windows/hardware/ff543088(v=vs.85).aspx
+or
+"Create User mode stack trace database"  （"Enable page heap" and ）
+ !heap -stat
+ !heap -stat -h "heap handle" 
+ !heap -p -a "UserPtr" will print the allocation stack
+
+How to: Launch the Debugger Automatically
+https://msdn.microsoft.com/en-us/library/a329t4ed(v=vs.100).aspx
+Image File Execution Options/.exe/Debugger=vsjitdebugger.exe
+
+堆溢出-normal page heap 、 full page heap
+见windbg !heap 命令normal page heap 、 full page heap的布局
+需要在application verifier内启用normal page heap或者full page heap
+normal page heap
+heap block添加额外metadata和fill pattern，堆管理器回收block时(即FreeHeap)，检查pattern是否被修改，如果被修改，表明corruption已发生
+额外的metadata结构DPH_BLOCK_INFORMATION内StackTrace记录分配这个block的调用栈
+normal page heap的User accessible part地址减0x20字节就是metadata DPH_BLOCK_INFORMATION
+full page heap
+User accessible part前后放至guard page，当尝试访问这些区域时，触发异常
