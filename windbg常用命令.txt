@@ -92,6 +92,7 @@ dt sym addr
 内核调试(kernel debugging kd)
 C:\>windbg -k com:port=COM2,baud=57600
 C:\>windbg -k com:pipe,port=\\.\pipe\pipe2
+xp下需要在启动文件加上 /DEBUG /DEBUGPORT=COM1
 
 用户模式异常断入内核调试器
 1.用gflag设置 system registry "Stop on exception" flag，重启，入调试模式
