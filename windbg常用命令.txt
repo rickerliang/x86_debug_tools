@@ -24,7 +24,7 @@ lm
 显示模块
 lm v m 模式串
 
-lmi
+!lmi
 显示模块详细信息
 包括pdb匹配GUID
 
@@ -34,9 +34,6 @@ lmi
 加载已卸载的模块
 .reload /i
 加载符号，不做匹配性检查
-
-!chksym
-检查符号
 
 !teb
 !peb
