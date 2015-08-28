@@ -1,3 +1,6 @@
+.dump /ma filename
+创建fulldump
+
 !address xxxx
 获取地址属性，例如栈，堆，代码
 
@@ -88,6 +91,11 @@ dt sym addr
 .symopt+
 增删符号加载选项，+0x40可忽略不匹配符号，强制加载
 
+sxe ld:xxx.dll
+当加载xxx.dll时中断点
+sxe ud:xxx.dll
+卸载时中断点
+其他命令参考Controlling Exceptions and Events
 ------------------------------------------
 内核调试(kernel debugging kd)
 C:\>windbg -k com:port=COM2,baud=57600
