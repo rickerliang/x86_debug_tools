@@ -23,6 +23,15 @@ bu 符号
 ba
 访问断点
 
+bc
+删除断点
+
+bd
+屏蔽断点
+
+be
+激活断点
+
 lm
 显示模块
 lm v m 模式串
@@ -96,6 +105,9 @@ sxe ld:xxx.dll
 sxe ud:xxx.dll
 卸载时中断点
 其他命令参考Controlling Exceptions and Events
+
+!chkimg
+检查dump内可执行模块是否与pdb及dll内容一致，用于检查代码被修改-文件修改
 ------------------------------------------
 内核调试(kernel debugging kd)
 C:\>windbg -k com:port=COM2,baud=57600
