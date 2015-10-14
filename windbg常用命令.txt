@@ -1,18 +1,36 @@
+******************************dump相关******************************
 .dump /ma filename
 创建fulldump
 
+.dumpdebug
+显示dump类型信息
+
+******************************地址、内存查看属性********************************
 !address xxxx
 获取地址属性，例如栈，堆，代码
+
+!address -summary
+显示进程内存总体信息，比较有用的是largest Region，用于判断进程是否有足够的连续空闲内存满足内存分配请求
+
+切换地址模式
+https://msdn.microsoft.com/en-us/library/aa384163(VS.85).aspx
+建议用 !wow64exts.sw
+.effmach
+一般是x86 amd64，用.切回默认
 
 dds xxxx xxxx
 输出地址范围及内容
 
-k 1000
-输出0x1000层调用栈
+u addr range
+显示指定addr起始，range内的汇编
 
-k=xxxx
-从xxxx地址开始显示调用栈
+ln addr
+显示距离最近addr的符号
 
+dt sym addr
+把addr解析为sym类型
+
+******************************程序调试******************************
 bp
 下普通断点，pdb要加载好
 bp @!"ExecutableName!std::pair<unsigned int,std::basic_string<unsigned short,std::char_traits<unsigned short>,std::allocator<unsigned short> > >::operator="
@@ -32,6 +50,16 @@ bd
 be
 激活断点
 
+bu function ".if(condition){exp}.else{gc}"
+条件断点，例如 bu wps!main ".if(poi(arg) > 0n123){}.else{gc}"
+
+sxe ld:xxx.dll
+当加载xxx.dll时中断点
+sxe ud:xxx.dll
+卸载时中断点
+其他命令参考Controlling Exceptions and Events
+
+******************************符号、模块******************************
 lm
 显示模块
 lm v m 模式串
@@ -47,44 +75,12 @@ lm v m 模式串
 .reload /i
 加载符号，不做匹配性检查
 
+!chkimg
+检查dump内可执行模块是否与pdb及dll内容一致，用于检查代码被修改-文件修改
+
+******************************进程环境******************************
 !teb
 !peb
-
-!gflag
-设置、查看当前gflag
-
-切换地址模式
-https://msdn.microsoft.com/en-us/library/aa384163(VS.85).aspx
-建议用 !wow64exts.sw
-.effmach
-一般是x86 amd64，用.切回默认
-
-u addr range
-显示指定addr起始，range内的汇编
-
-.fnent
-获取指定地址的function table entry，包含函数的unwind info，对x64 manual stack walking有帮助的信息
-
-k = <rsp> <rip> <frame_count>
-x64下manual stack walking
-x64下，rsp在函数执行完prologue之后就不会变化(调用约定)；
-所以
-0.如果函数内执行了call指令，call指令返回地址压栈后，rsp就会减8；
-1.也就是说，在stack reconstruction时，识别到返回地址所在的栈地址，再加8，就是当前函数执行完prologue的rsp；
-2.由于x64非叶子函数有function table entry，记录unwind info，即prologue操作，所以根据unwind info，可以还原进入当前函数时rsp的值，这个值就是指向本函数执行完时的返回地址；
-3.这时在回到步骤1，就是manual stack walking了
-
-ln addr
-显示距离最近addr的符号
-
-dt sym addr
-把addr解析为sym类型
-
-.dumpdebug
-显示dump类型信息
-
-!heap -s
-显示堆信息
 
 |
 显示进程基本信息
@@ -100,14 +96,38 @@ dt sym addr
 .symopt+
 增删符号加载选项，+0x40可忽略不匹配符号，强制加载
 
-sxe ld:xxx.dll
-当加载xxx.dll时中断点
-sxe ud:xxx.dll
-卸载时中断点
-其他命令参考Controlling Exceptions and Events
+!gflag
+设置、查看当前gflag
 
-!chkimg
-检查dump内可执行模块是否与pdb及dll内容一致，用于检查代码被修改-文件修改
+******************************堆、堆、堆******************************
+!heap -s
+显示堆信息
+
+!heap -p -a addr
+在page heap情况下显示地址对应的堆信息及创建销毁的调用栈
+
+!heap -p -h handle
+在page heap情况下显示handle对应的堆信息，并提示可能存在的堆错误
+
+******************************调用栈******************************
+k 1000
+输出0x1000层调用栈
+
+k=xxxx
+从xxxx地址开始显示调用栈
+
+.fnent
+获取指定地址的function table entry，包含函数的unwind info，对x64 manual stack walking有帮助的信息
+
+k = <rsp> <rip> <frame_count>
+x64下manual stack walking
+x64下，rsp在函数执行完prologue之后就不会变化(调用约定)；
+所以
+0.如果函数内执行了call指令，call指令返回地址压栈后，rsp就会减8；
+1.也就是说，在stack reconstruction时，识别到返回地址所在的栈地址，再加8，就是当前函数执行完prologue的rsp；
+2.由于x64非叶子函数有function table entry，记录unwind info，即prologue操作，所以根据unwind info，可以还原进入当前函数时rsp的值，这个值就是指向本函数执行完时的返回地址；
+3.这时在回到步骤1，就是manual stack walking了
+
 ------------------------------------------
 内核调试(kernel debugging kd)
 C:\>windbg -k com:port=COM2,baud=57600
