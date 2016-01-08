@@ -59,6 +59,11 @@ sxe ud:xxx.dll
 卸载时中断点
 其他命令参考Controlling Exceptions and Events
 
+!slist addr sym offset
+把地址解析为single link list，list node为sym类型，例如
+!slist $teb _EXCEPTION_REGISTRATION_RECORD 0
+解析当前线程的结构化异常处理链
+
 ******************************符号、模块******************************
 lm
 显示模块
